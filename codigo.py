@@ -266,11 +266,12 @@ long_min = math.log(m,base)
 print(long_min)
 
 # Separo parte entera del resultado y parte decimal
-parte_decimal, parte_entera = math.modf(long_min)
-print(parte_entera) #Como tiene que ser el entero superior siempre va a ser 1 mas que el que salga
-print(parte_decimal)
+long_min = math.ceil(long_min)
+#parte_decimal, parte_entera = math.modf(long_min)
+#print(parte_entera) #Como tiene que ser el entero superior siempre va a ser 1 mas que el que salga
+#print(parte_decimal)
 
-long_min = int(parte_entera+1) #hago un cast a entero porque sino quedaba float
+#long_min = int(parte_entera+1) #hago un cast a entero porque sino quedaba float
 print("Longitud mínima (Entero Superior) = ", long_min)
 
 
