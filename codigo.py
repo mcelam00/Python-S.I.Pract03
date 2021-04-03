@@ -302,9 +302,13 @@ mensaje = ""
 for secuencia in secsCodFuente: #recorro cada secuencia de long mínima del array
     mensaje = mensaje + decodFuente(secuencia, alfabeto, base)
 
+#es posible que vengan 2 espacios juntos y eso equivale para nosostros al salto de linea \n
+mensaje = mensaje.replace("  ", "\n")
+
 
 print("\n======================================================================")
-print("MENSAJE DECODIFICADO ="+mensaje)
+print("MENSAJE DECODIFICADO:")
+print(mensaje)
 print("======================================================================")
 
 print("\nFIN DEL PROGRAMA")
