@@ -94,7 +94,7 @@ def procesarFuenteInformacion(fuenteInformacion):
 
 def leerDatoEntrada(nombre_archivo):
     lista = []
-    
+    c = ""
     
     
     with open(nombre_archivo, 'r', encoding='utf8') as f: #open abre el archivo; r en modo lectura; f el descriptor de fichero; importante decirle que es utf8 el fichero que sino no carga las ñ ni ´´
@@ -103,13 +103,24 @@ def leerDatoEntrada(nombre_archivo):
 
 
         while linea: #mientras que siga habiendo líneas
-            #Cojo caracter a caracter de la línea
+            #Cojo caracter a caracter de la línea. 
             for caracter in linea:
+                               
+                #if caracter == '\n'or caracter == ',' or caracter == ' ': #los \n los ignoramos, como si no estuvieran y las comas y espacios que los separan también
+                if caracter == '\n':
+                  continue
                 
-                if caracter == '\n'or caracter == ',' or caracter == ' ': #los \n los ignoramos, como si no estuvieran y las comas y espacios que los separan también
-                   continue
+                                 
+                if caracter == ',' or caracter == ' ': #Al llegar a una , salvo el caracter (puede haber caracteres dobles o triples dependiendo de si no es binario sino mod 10 pej)
+                    lista.append(c)
+                    c = "" #reseteamos c
+                #si caracter aun no es , seguimos guardando en c porque aún no acabó el numero a leer
+                else:
+                    c = c + caracter
 
-                lista.append(caracter)
+                
+
+                
         
             linea = f.readline()
 
@@ -117,21 +128,19 @@ def leerDatoEntrada(nombre_archivo):
 
     return lista
 
-def decodLineal(identidad, secuencias, filas, columnas):
-    secDecodific = ""
+def decodLineal(identidad, secuencias, filas, columnas): #NO PODEMOS DEVOLVER 1 STRING PORQUE PUEDE HABER NUMEROS QUE SEAN DE 2 O MAS SI APPENDEO COMO STRING SE PIERDE QUE ES UN NUM DE 2 POS
+    secDecodific = []
     #Si la identidad esta a la izda en la Generadora me quedo con el numero de posiciones que indiquen las filas desde la izda
     if identidad == "I":
-        for secuencia in secuencias: #cada pos del vector secuencias
-            print(secuencia)
+        for secuencia in secuencias: #cada pos del vector secuencias (cada trocito de long columnas)
+            #print(secuencia)
             for i in range(filas):
-                secDecodific = secDecodific + secuencia[i] #i para cada caracter dentro de cada secuencia codificada linealmente desde el 0
-
-
+                secDecodific.append(secuencia[i]) #i para cada caracter dentro de cada secuencia codificada linealmente desde el 0
     else:    
     #Si no, desde la derecha
           for secuencia in secuencias: #cada pos del vector secuencias
             for i in range(filas, columnas):
-                secDecodific = secDecodific + secuencia[i]#i para cada caracter dentro de cada secuencia codificada linealmente desde la segunda mitad
+                secDecodific.append(secuencia[i]) #i para cada caracter dentro de cada secuencia codificada linealmente desde la segunda mitad
 
     return secDecodific
 
@@ -140,30 +149,44 @@ def decodFuente(secuencia, alfabeto, base):
     caracter = ''
 
     #  Convertir cada bloque de binario al entero decimal (en éste caso)
-    entero = int(secuencia, base) #convierto la secuencia en string a un numero en la base que hayamos metido, si es 2 binario a decimal, si es 3 ternario a decimal
-    print(entero)
+    #entero = int(secuencia, base) #convierto la secuencia en string a un numero en la base que hayamos metido, si es 2 binario a decimal, si es 3 ternario a decimal
+    #print(entero)
+    print ("Sec original long r =", secuencia) #secuencia, es un array de long r, y tengo que transformarlo en un entero decimal (no módulo base)
+    
+    entero = 0
+    exponente = 0
+    pos = len(secuencia)-1 #dentro de esas r veces empiezo a coger por el final y voy bajando (derch a izda)
 
+    for num in secuencia: #recorre las posiciones (r veces)
+        
+        entero = entero + (int(secuencia[pos])*(base**exponente)) 
+        exponente = exponente+1
+        pos = pos-1
+    
+   
     # Calculo la posicion en el alfabeto para el entero anterior
     posicion = entero + 1
 
     # Busco en el alfabeto la posicion teniendo en cuenta que tal como está almacenado el índice es la posición obtenida anterior-1
-    print(alfabeto[posicion-1])
+    print("Símbolo final asociado = ", alfabeto[posicion-1])
 
     caracter = alfabeto[posicion-1]
 
     return caracter
 
 
-
-
-
+def convertirAArrayDeStrings(lista):
+    arrayDeStrings = []
+    for num in lista:
+        arrayDeStrings.append(str(num))
+    return arrayDeStrings
 
 
 ##PROGRAMA------------------------
 print("Bienvenid@ a la Práctica 3: Simulacion de una codificación binaria lineal SIN RUIDO")
-print("Introduzca las Filas de la matríz")
+print("Introduzca las Filas de la matríz GENERADORA")
 filas = input()
-print("Introduzca las Columnas de la matríz")
+print("Introduzca las Columnas de la matríz GENERADORA")
 columnas = input()
 print("La Generadora es de Orden "+filas+"x"+columnas)
 
@@ -191,7 +214,7 @@ alfabeto = procesarFuenteInformacion(fuenteInformacion) #de la fuente de informa
 
 print("Alfabeto = ", alfabeto)
 print("Tamaño = ", len(alfabeto))
-m = len(alfabeto)
+m = len(alfabeto) #Numero de símbolos del alfabeto
 
 
 #ENTRADA MANUAL
@@ -200,13 +223,23 @@ m = len(alfabeto)
 #print(alfabeto)
 
 
-    # Leer dato entrada (lista L)
+    # Leer dato entrada (lista L) OJO, NECESARIA COMA FINAL PARA QUE GUARDE EL ÚLTIMO
 
-lista = leerDatoEntrada('/Users/mario/Desktop/Segundo Cuatrimestre/Seguridad Informática/Prácticas/Practica_3_SI/Resolución/Dato.txt')
-print("Lista Entrada", lista)
+#lista = leerDatoEntrada('/Users/mario/Desktop/Segundo Cuatrimestre/Seguridad Informática/Prácticas/Practica_3_SI/Resolución/Dato.txt')
+#print("Lista Entrada", lista)
 
 
-    # Calculo el tamaño de la lista y lo divido por el número de columnas de la generadora
+
+    #ENTRADA DATO MANUAL (MAS CÓMODO):
+lista = [2,6,2,5,6,5,4,5,0,2,8,6,2,9,0,0,1,10,1,2,3,1,0,1,1,4,6,8,0,8,1,3,2,0,9,4,2,5,4,9,9,9,0,4,1,1,7,1,6,0,2,5,7,8,4,0,0,2,1,0,4,7,10,10,0,4,5,1,4,7,1,7,1,10,9,7,5,5,1,4,1,4,3,2,2,5,1,0,9,6,3,8,0,8,8,10,4,9,1,2,2,1,8,2,7,5,1,7,9,7,9,0,1,10,0,7,7,7,7,8,0,3,2,5,5,5,1,4,2,2,0,7,3,5,2,6,5,2,4,6]
+lista = convertirAArrayDeStrings(lista)
+print("Dato Entrada = ")
+print(lista)
+
+
+
+
+    # Calculo el tamaño de la lista (longitud del mjs codificado) y lo divido por el número de columnas de la generadora
 tam = len(lista)
 print("Tam Dato Entrada = ", tam)
 
@@ -219,38 +252,44 @@ print("Resto = ", resto)
 
     # De la lista leída tendremos: "cociente" secuencias de "columnas" elementos y una cola de "resto" elementos
 
-secuencia = ""
+secuencia = []
 secuencias = []
 contador = 0
 
 for i in range(cociente*columnas):
-    secuencia = secuencia + lista[i] #añado el elemento subi de la lista de entrada
-    print(secuencia)
+    secuencia.append(lista[i]) #añado el elemento subi de la lista de entrada
+    #print(secuencia)
     contador = contador + 1
     
     if contador == columnas:
         #he completado una secuencia, la salvo en el vector de secuencias separadas
         secuencias.append(secuencia)
-        print("vuelco")
-        secuencia = ""
+        #print("vuelco")
+        secuencia = []
         contador = 0
 
 
-cola = ""
+cola = [] #array para que no se pierda si es qario y el numero es mas de una cifra
 
 for i in range((cociente*columnas), tam): #cociente*columnas fue excluido en el bucle previo porque llegaba justo hasta el valor anterior a ese y ahora parto desde ese inclusive y hasta el final para coger todo lo que quede
-    cola = cola + lista[i]
+    cola.append(lista[i])
 
 
+print("SECUENCIAS DE COLUMNA ELEMENTOS = ")
 print(secuencias)
+print("COLA")
 print(cola)
 
 
     # Decodificación Lineal
 
 cod_fuente_lista = decodLineal(identidad, secuencias, filas, columnas) #tengo la secuencia decodificada linealmente sin la cola
-cod_fuente_lista = cod_fuente_lista + cola
-print(cod_fuente_lista)
+
+#Añadimos la cola
+for num in cola:
+    cod_fuente_lista.append(num) #tendriamos el msj decodif linealmente pero manteniendo los dobles, triples... numeros porque cada uno tiene su posicion en la lista (actualemnte es un msj metido en array)
+
+print("MSJ DEC LINEALMENTE = ", cod_fuente_lista)
 
 
     # Calcular la longitud mínima en bloque (para codificar en binario en éste caso)
@@ -276,21 +315,21 @@ print("Longitud mínima (Entero Superior) = ", long_min)
 
 
 
-    # Troceo la secuencia en bloques de esa long mínima
+    # Troceo el mensaje dec linealmente en bloques/secuencias de esa long mínima (debo usar un array de arrays para no perder los simbolos dobles, triples... quarios vaya)
 
 secsCodFuente = []
-secuenciaLongMin = ""
+secuenciaLongMin = []
 contador = 0
 
-for i in cod_fuente_lista: #caracter a caracter de las secuencias
-    secuenciaLongMin = secuenciaLongMin + i #añado cada caracter
+for i in cod_fuente_lista: #caracter a caracter del mensaje + cola (string) vamos cogiendo hasta completar r términos
+    secuenciaLongMin.append(i) #añado cada caracter
     contador = contador + 1
     
     if contador == long_min:
         #he completado una secuencia, la salvo en el vector de secuencias separadas
         secsCodFuente.append(secuenciaLongMin)
-        print("vuelco")
-        secuenciaLongMin = ""
+        #print("vuelco")
+        secuenciaLongMin = []
         contador = 0
 
 
@@ -298,6 +337,9 @@ print(secsCodFuente)
 
     # CICLO - Repetir tantas veces como secuencias de long mínima haya en nuestra secsCodFuente. Es decir, como marque la longitud
 mensaje = ""
+
+print()
+print("PROCESO DE DECODIFICACION DE LA FUENTE:")
 
 for secuencia in secsCodFuente: #recorro cada secuencia de long mínima del array
     mensaje = mensaje + decodFuente(secuencia, alfabeto, base)
